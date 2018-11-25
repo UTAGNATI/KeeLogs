@@ -25,7 +25,18 @@ namespace KeePass
     {
         private IPluginHost m_host = null;
 
-        private IList<string> lastModList;
+        internal class Entry
+        {
+            // Auto-implemented properties.
+            public string Uuid { get; set; }
+            public string Title { get; set; }
+            public string UserName { get; set; }
+            public string Password { get; set; }
+        }
+
+        private IList<Entry> oldEntriesList;
+        private IList<Entry> newEntriesLIst;//facultatif ?
+        private IList<Entry> modifiedEntriesList;
 
         private ToolStripSeparator m_tsSeparator = null;
         private ToolStripMenuItem m_tsmiPopup = null;
@@ -74,48 +85,78 @@ namespace KeePass
             return true;
         }
 
-        public IList<string> FindLastModEnt(PwDatabase pd)
+        //Permet d'enregistrer les dates de modification de toutes les entrées ainsi que toutes les valeurs des champs
+        internal IList<Entry> FindLastModEnt(PwDatabase pd) 
         {
             PwObjectList<PwEntry> lEntries = m_host.Database.RootGroup.GetEntries(true);
-            IList<string> lResults = new List<string>();
+            IList<Entry> lResults = new List<Entry>();
 
-            string newLine;
+            Entry newEntry;
 
             foreach (PwEntry pe in lEntries)
             {
-                newLine = pe.Strings.ReadSafe(PwDefs.TitleField) + " " + pe.Strings.ReadSafe(PwDefs.UserNameField) + " " + TimeUtil.ToDisplayString(pe.LastModificationTime);
-                lResults.Add(newLine);
+
+                newEntry = new Entry{Uuid = pe.Uuid.ToHexString() , UserName = pe.Strings.ReadSafe(PwDefs.UserNameField), Title = pe.Strings.ReadSafe(PwDefs.TitleField), Password = pe.Strings.ReadSafe(PwDefs.PasswordField) };
+                lResults.Add(newEntry);
             }
 
             return lResults;
+        }
+
+        internal void EntriesListCompare(IList<Entry> oldEntriesList)
+        {
+            PwObjectList<PwEntry> lEntries = m_host.Database.RootGroup.GetEntries(true);
+
+            foreach (Entry e in oldEntriesList)
+            {
+                foreach (PwEntry pe in lEntries) {
+                    if(e.Uuid.Equals(pe.Uuid.ToHexString())) //si l'élément est bien le même au niveau du ID
+                    {
+                        if (e.Title != pe.Strings.ReadSafe(PwDefs.TitleField))
+                        {
+                            // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid a été modifié / oldTitle : ... - newTitle : ...
+                            File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", pe.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldTitle : " + e.Title + " - newTitle : " + pe.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+                        }
+                        if (e.UserName != pe.Strings.ReadSafe(PwDefs.UserNameField))
+                        {
+                            // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldUserName : ... - newUserName : ...
+                            File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", pe.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldUsername : " + e.UserName + " - newUsername : " + pe.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
+                        }
+                        if (e.Password != pe.Strings.ReadSafe(PwDefs.PasswordField))
+                        {
+                            // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldPassword : ... - newPassword : ...
+                            File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", pe.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldPassword : " + e.Password + " - newPassword : " + pe.Strings.ReadSafe(PwDefs.PasswordField) + Environment.NewLine);
+                        }
+                    }
+                }
+            }
         }
 
         private void OnEcasEvent(object sender, EcasRaisingEventArgs e)
         {
             if (e.Event.Type.Equals(CopiedEntryInfo))
             {
-                lastModList = FindLastModEnt(m_host.Database);
-                File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", m_host.MainWindow.GetSelectedEntry(true).Strings.ReadSafe(PwDefs.TitleField) + " has been copied to the clipboar at " + m_host.MainWindow.GetSelectedEntry(true).LastAccessTime + "\nLast modification the : " + m_host.MainWindow.GetSelectedEntry(true).LastModificationTime + Environment.NewLine);
-                
+                File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", m_host.MainWindow.GetSelectedEntry(true).LastAccessTime + m_host.MainWindow.GetSelectedEntry(true).Strings.ReadSafe(PwDefs.TitleField) + " has been copied to the clipboar at " + Environment.NewLine);
             }
 
-            // else if entrée modifiée
+            // else if entrée modifiée globalwindowsmanager
 
             else if (e.Event.Type.Equals(OpenedDatabaseFile))
             {
-                lastModList = FindLastModEnt(m_host.Database);
-                File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", "Ouverture de la Database" + DateTime.Now.ToString("HH:mm:ss") + " / " + DateTime.Today.ToString("dd-MM-yyyy") + Environment.NewLine);
+                //appel d'une fcontion qui enregistre l'etat actuel de la bdd
+                oldEntriesList = FindLastModEnt(m_host.Database);
+
+                File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", DateTime.Now.ToString("HH:mm:ss") + " / " + DateTime.Today.ToString("dd-MM-yyyy") + "Ouverture de la Database" + Environment.NewLine);
 
             }
             else if (e.Event.Type.Equals(ClosingDatabaseFilePost))
             {
-                lastModList = FindLastModEnt(m_host.Database);
-                foreach (String entry in lastModList)
-                {
-                    File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", entry + Environment.NewLine);
-                }
-                File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", "Fermeture de la Database" + DateTime.Now.ToString("HH:mm:ss") + " / " + DateTime.Today.ToString("dd-MM-yyyy") + Environment.NewLine);
+                File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", DateTime.Now.ToString("HH:mm:ss") + " / " + DateTime.Today.ToString("dd-MM-yyyy") + "Fermeture de la Database" + Environment.NewLine);
 
+                //recuperation de l'état actuel de la bdd + comparaison avec celle enregistrée à l'ouverture de la bdd pour voir les différences et les logger
+                EntriesListCompare(oldEntriesList);
+
+                //reste encore à log les ajouts et suppressions d'entrées
             }
         }
 
@@ -134,15 +175,10 @@ namespace KeePass
 
             MessageBox.Show(m_host.Database.Name);
 
-            //CreateAndShowEntryList(EntryReportDelegate f);
-
-
         }
 
         public override void Terminate()
         {
-            //ecrit la liste de toutes les dernières modifications dans un fichier txt
-            //System.IO.File.WriteAllLines(@"D:\TAGNATI\source\TestLogPlugin.txt", lastModList);
 
             // Remove all of our menu items
             ToolStripItemCollection tsMenu = m_host.MainWindow.ToolsMenu.DropDownItems;
