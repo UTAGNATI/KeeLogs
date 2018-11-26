@@ -35,8 +35,6 @@ namespace KeePass
         }
 
         private IList<Entry> oldEntriesList;
-        private IList<Entry> newEntriesLIst;//facultatif ?
-        private IList<Entry> modifiedEntriesList;
 
         private ToolStripSeparator m_tsSeparator = null;
         private ToolStripMenuItem m_tsmiPopup = null;
@@ -80,8 +78,11 @@ namespace KeePass
             m_tsmiPopup.DropDownItems.Add(m_tsmiAddGroups);
 
             m_host.TriggerSystem.RaisingEvent += this.OnEcasEvent;
+            //m_host.MainWindow.GetSelectedEntry(true).Touched += this.OnSavedEntry; je comprend pas comment Touched focntionne
+
 
             GlobalWindowManager.WindowRemoved += this.OnSavedEntry; //eventhandler sur la fermeture d'une fenetre quelconque (pas seulement une fenetre de modification d'entrée !!!)
+            //GlobalWindowManager.WindowAdded +=; //trouver comment savoir si c'est une fenetre d'ajout qui vient de s'ouvirir
 
             return true;
         }
@@ -107,6 +108,11 @@ namespace KeePass
         //Permet de comparer deux listes d'Entry/PwEntry
         internal void EntriesListCompare(IList<Entry> oldEntriesList, PwEntry selectedEntry)
         {
+            if(selectedEntry == null)
+            {
+                return;
+            }
+
             PwObjectList<PwEntry> lEntries = m_host.Database.RootGroup.GetEntries(true);
 
             foreach (Entry e in oldEntriesList)
@@ -116,19 +122,19 @@ namespace KeePass
                     if (e.Title != selectedEntry.Strings.ReadSafe(PwDefs.TitleField))
                     {
                         // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid a été modifié / oldTitle : ... - newTitle : ...
-                        File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldTitle : " + e.Title + " - newTitle : " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+                        File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldTitle : " + e.Title + " - newTitle : " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
                         e.Title = selectedEntry.Strings.ReadSafe(PwDefs.TitleField); //on met à jour la oldEntriesList en cas de re-modification
                     }
                     if (e.UserName != selectedEntry.Strings.ReadSafe(PwDefs.UserNameField))
                     {
                         // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldUserName : ... - newUserName : ...
-                        File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldUsername : " + e.UserName + " - newUsername : " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
+                        File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldUsername : " + e.UserName + " - newUsername : " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
                         e.UserName = selectedEntry.Strings.ReadSafe(PwDefs.UserNameField); //on met à jour la oldEntriesList en cas de re-modification
                     }
                     if (e.Password != selectedEntry.Strings.ReadSafe(PwDefs.PasswordField))
                     {
                         // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldPassword : ... - newPassword : ...
-                        File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldPassword : " + e.Password + " - newPassword : " + selectedEntry.Strings.ReadSafe(PwDefs.PasswordField) + Environment.NewLine);
+                        File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldPassword : " + e.Password + " - newPassword : " + selectedEntry.Strings.ReadSafe(PwDefs.PasswordField) + Environment.NewLine);
                         e.Password = selectedEntry.Strings.ReadSafe(PwDefs.PasswordField); //on met à jour la oldEntriesList en cas de re-modification
                     }
                 }
@@ -141,23 +147,20 @@ namespace KeePass
             {
                 File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", m_host.MainWindow.GetSelectedEntry(true).LastAccessTime + m_host.MainWindow.GetSelectedEntry(true).Strings.ReadSafe(PwDefs.TitleField) + " has been copied to the clipboar at " + Environment.NewLine);
             }
-
-            // else if entrée modifiée globalwindowsmanager
-
             else if (e.Event.Type.Equals(OpenedDatabaseFile))
             {
                 //appel d'une fcontion qui enregistre l'etat actuel de la bdd
                 oldEntriesList = FindLastModEnt(m_host.Database);
 
-                File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", DateTime.Now.ToString("HH:mm:ss") + " / " + DateTime.Today.ToString("dd-MM-yyyy") + "Ouverture de la Database" + Environment.NewLine);
+                File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", DateTime.Today.ToString("dd-MM-yyyy ") + " / " + DateTime.Now.ToString("HH:mm:ss")  + "Ouverture de la Database" + Environment.NewLine);
 
             }
             else if (e.Event.Type.Equals(ClosingDatabaseFilePost))
             {
-                File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", DateTime.Now.ToString("HH:mm:ss") + " / " + DateTime.Today.ToString("dd-MM-yyyy") + "Fermeture de la Database" + Environment.NewLine);
+                File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", DateTime.Today.ToString("dd-MM-yyyy ") + " / " + DateTime.Now.ToString("HH:mm:ss") + "Fermeture de la Database" + Environment.NewLine);
 
                 //recuperation de l'état actuel de la bdd + comparaison avec celle enregistrée à l'ouverture de la bdd pour voir les différences et les logger
-                EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true));
+                EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true)); 
 
                 //reste encore à log les ajouts et suppressions d'entrées
             }
@@ -165,12 +168,6 @@ namespace KeePass
 
         private void OnSavedEntry(object sender, GwmWindowEventArgs e)
         {
-            if (!m_host.Database.IsOpen)
-            {
-                //Quand la base n'est pas ouverte l'instance de EntriesListCompare n'existe pas
-                return;
-            }
-
             EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true));
         }
 
@@ -198,6 +195,8 @@ namespace KeePass
 
             // Important! Remove event handlers!
             m_host.MainWindow.FileSaved -= OnFileSaved;
+            //m_host.MainWindow.GetSelectedEntry(true).Touched -= OnSavedEntry;
+
         }
 
         private void OnFileSaved(object sender, FileSavedEventArgs e)
