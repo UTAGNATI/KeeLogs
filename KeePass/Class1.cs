@@ -80,7 +80,8 @@ namespace KeePass
             m_tsmiPopup.DropDownItems.Add(m_tsmiAddGroups);
 
             m_host.TriggerSystem.RaisingEvent += this.OnEcasEvent;
-            AutoType.FilterSend += this.OnAutoType;
+
+            GlobalWindowManager.WindowRemoved += this.OnSavedEntry; //eventhandler sur la fermeture d'une fenetre quelconque (pas seulement une fenetre de modification d'entrée !!!)
 
             return true;
         }
@@ -103,30 +104,32 @@ namespace KeePass
             return lResults;
         }
 
-        internal void EntriesListCompare(IList<Entry> oldEntriesList)
+        //Permet de comparer deux listes d'Entry/PwEntry
+        internal void EntriesListCompare(IList<Entry> oldEntriesList, PwEntry selectedEntry)
         {
             PwObjectList<PwEntry> lEntries = m_host.Database.RootGroup.GetEntries(true);
 
             foreach (Entry e in oldEntriesList)
             {
-                foreach (PwEntry pe in lEntries) {
-                    if(e.Uuid.Equals(pe.Uuid.ToHexString())) //si l'élément est bien le même au niveau du ID
+                if(e.Uuid.Equals(selectedEntry.Uuid.ToHexString())) //si l'élément est bien le même au niveau du ID
+                {
+                    if (e.Title != selectedEntry.Strings.ReadSafe(PwDefs.TitleField))
                     {
-                        if (e.Title != pe.Strings.ReadSafe(PwDefs.TitleField))
-                        {
-                            // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid a été modifié / oldTitle : ... - newTitle : ...
-                            File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", pe.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldTitle : " + e.Title + " - newTitle : " + pe.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
-                        }
-                        if (e.UserName != pe.Strings.ReadSafe(PwDefs.UserNameField))
-                        {
-                            // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldUserName : ... - newUserName : ...
-                            File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", pe.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldUsername : " + e.UserName + " - newUsername : " + pe.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
-                        }
-                        if (e.Password != pe.Strings.ReadSafe(PwDefs.PasswordField))
-                        {
-                            // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldPassword : ... - newPassword : ...
-                            File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", pe.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldPassword : " + e.Password + " - newPassword : " + pe.Strings.ReadSafe(PwDefs.PasswordField) + Environment.NewLine);
-                        }
+                        // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid a été modifié / oldTitle : ... - newTitle : ...
+                        File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldTitle : " + e.Title + " - newTitle : " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+                        e.Title = selectedEntry.Strings.ReadSafe(PwDefs.TitleField); //on met à jour la oldEntriesList en cas de re-modification
+                    }
+                    if (e.UserName != selectedEntry.Strings.ReadSafe(PwDefs.UserNameField))
+                    {
+                        // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldUserName : ... - newUserName : ...
+                        File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldUsername : " + e.UserName + " - newUsername : " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
+                        e.UserName = selectedEntry.Strings.ReadSafe(PwDefs.UserNameField); //on met à jour la oldEntriesList en cas de re-modification
+                    }
+                    if (e.Password != selectedEntry.Strings.ReadSafe(PwDefs.PasswordField))
+                    {
+                        // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldPassword : ... - newPassword : ...
+                        File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldPassword : " + e.Password + " - newPassword : " + selectedEntry.Strings.ReadSafe(PwDefs.PasswordField) + Environment.NewLine);
+                        e.Password = selectedEntry.Strings.ReadSafe(PwDefs.PasswordField); //on met à jour la oldEntriesList en cas de re-modification
                     }
                 }
             }
@@ -154,15 +157,21 @@ namespace KeePass
                 File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", DateTime.Now.ToString("HH:mm:ss") + " / " + DateTime.Today.ToString("dd-MM-yyyy") + "Fermeture de la Database" + Environment.NewLine);
 
                 //recuperation de l'état actuel de la bdd + comparaison avec celle enregistrée à l'ouverture de la bdd pour voir les différences et les logger
-                EntriesListCompare(oldEntriesList);
+                EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true));
 
                 //reste encore à log les ajouts et suppressions d'entrées
             }
         }
 
-        private void OnAutoType(object sender, AutoTypeEventArgs e)
+        private void OnSavedEntry(object sender, GwmWindowEventArgs e)
         {
-            // e.Sequence will be auto-typed
+            if (!m_host.Database.IsOpen)
+            {
+                //Quand la base n'est pas ouverte l'instance de EntriesListCompare n'existe pas
+                return;
+            }
+
+            EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true));
         }
 
         private void OnMenuAddGroups(object sender, EventArgs e)
