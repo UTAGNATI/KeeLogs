@@ -75,8 +75,8 @@ namespace KeePass
 
             // Add menu item 'Add Some Groups'
             m_tsmiAddGroups = new ToolStripMenuItem();
-            m_tsmiAddGroups.Text = "Test";
-            m_tsmiAddGroups.Click += OnMenuAddGroups;
+            m_tsmiAddGroups.Text = "Choisir l'emplacement des Logs";
+            m_tsmiAddGroups.Click += ChoosePath;
             m_tsmiPopup.DropDownItems.Add(m_tsmiAddGroups);
 
             m_host.TriggerSystem.RaisingEvent += this.OnEcasEvent;
@@ -116,19 +116,19 @@ namespace KeePass
                     if (e.Title != selectedEntry.Strings.ReadSafe(PwDefs.TitleField))
                     {
                         // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid a été modifié / oldTitle : ... - newTitle : ...
-                        File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldTitle : " + e.Title + " - newTitle : " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+                        File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldTitle : " + e.Title + " - newTitle : " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
                         e.Title = selectedEntry.Strings.ReadSafe(PwDefs.TitleField); //on met à jour la oldEntriesList en cas de re-modification
                     }
                     if (e.UserName != selectedEntry.Strings.ReadSafe(PwDefs.UserNameField))
                     {
                         // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldUserName : ... - newUserName : ...
-                        File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldUsername : " + e.UserName + " - newUsername : " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
+                        File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldUsername : " + e.UserName + " - newUsername : " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
                         e.UserName = selectedEntry.Strings.ReadSafe(PwDefs.UserNameField); //on met à jour la oldEntriesList en cas de re-modification
                     }
                     if (e.Password != selectedEntry.Strings.ReadSafe(PwDefs.PasswordField))
                     {
                         // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldPassword : ... - newPassword : ...
-                        File.AppendAllText(@"D:\TAGNATI\source\ModifLogs.txt", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldPassword : " + e.Password + " - newPassword : " + selectedEntry.Strings.ReadSafe(PwDefs.PasswordField) + Environment.NewLine);
+                        File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins", selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldPassword : " + e.Password + " - newPassword : " + selectedEntry.Strings.ReadSafe(PwDefs.PasswordField) + Environment.NewLine);
                         e.Password = selectedEntry.Strings.ReadSafe(PwDefs.PasswordField); //on met à jour la oldEntriesList en cas de re-modification
                     }
                 }
@@ -139,7 +139,7 @@ namespace KeePass
         {
             if (e.Event.Type.Equals(CopiedEntryInfo))
             {
-                File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", m_host.MainWindow.GetSelectedEntry(true).LastAccessTime + m_host.MainWindow.GetSelectedEntry(true).Strings.ReadSafe(PwDefs.TitleField) + " has been copied to the clipboar at " + Environment.NewLine);
+                File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins", m_host.MainWindow.GetSelectedEntry(true).LastAccessTime + m_host.MainWindow.GetSelectedEntry(true).Strings.ReadSafe(PwDefs.TitleField) + " has been copied to the clipboar at " + Environment.NewLine);
             }
 
             // else if entrée modifiée globalwindowsmanager
@@ -149,12 +149,12 @@ namespace KeePass
                 //appel d'une fcontion qui enregistre l'etat actuel de la bdd
                 oldEntriesList = FindLastModEnt(m_host.Database);
 
-                File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", DateTime.Now.ToString("HH:mm:ss") + " / " + DateTime.Today.ToString("dd-MM-yyyy") + "Ouverture de la Database" + Environment.NewLine);
+                File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins", DateTime.Now.ToString("HH:mm:ss") + " / " + DateTime.Today.ToString("dd-MM-yyyy") + "Ouverture de la Database" + Environment.NewLine);
 
             }
             else if (e.Event.Type.Equals(ClosingDatabaseFilePost))
             {
-                File.AppendAllText(@"D:\TAGNATI\source\Logs.txt", DateTime.Now.ToString("HH:mm:ss") + " / " + DateTime.Today.ToString("dd-MM-yyyy") + "Fermeture de la Database" + Environment.NewLine);
+                File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins", DateTime.Now.ToString("HH:mm:ss") + " / " + DateTime.Today.ToString("dd-MM-yyyy") + "Fermeture de la Database" + Environment.NewLine);
 
                 //recuperation de l'état actuel de la bdd + comparaison avec celle enregistrée à l'ouverture de la bdd pour voir les différences et les logger
                 EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true));
@@ -174,15 +174,34 @@ namespace KeePass
             EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true));
         }
 
-        private void OnMenuAddGroups(object sender, EventArgs e)
+        private void ChoosePath(object sender, EventArgs e)
         {
             if (!m_host.Database.IsOpen)
             {
-                MessageBox.Show("You first need to open a database!", "Formind Plugin");
+                MessageBox.Show("Vous devez ouvrir une database d'abord!", "Formind Plugin");
                 return;
             }
 
-            MessageBox.Show(m_host.Database.Name);
+            MessageBox.Show("Choisissez l'emplacement où seront sauvegardés les Logs");
+            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            dialog.Description = "Choisir un chemin";
+            dialog.ShowDialog();
+            if (dialog.SelectedPath.Equals(""))
+            {
+                return;
+            }
+
+            // Open up filestream
+            FileStream fs;
+            try
+            {
+                fs = new FileStream(Path.Combine(dialog.SelectedPath, "Logs.txt"), FileMode.Create);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                MessageBox.Show("Accès refusé");
+                return;
+            }
 
         }
 
