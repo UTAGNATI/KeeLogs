@@ -99,7 +99,6 @@ namespace KeePass
 
             foreach (PwEntry pe in lEntries)
             {
-
                 newEntry = new Entry{Uuid = pe.Uuid.ToHexString() , UserName = pe.Strings.ReadSafe(PwDefs.UserNameField), Title = pe.Strings.ReadSafe(PwDefs.TitleField), Password = pe.Strings.ReadSafe(PwDefs.PasswordField) };
                 lResults.Add(newEntry);
             }
@@ -125,7 +124,7 @@ namespace KeePass
                     {
                         // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid a été modifié / oldTitle : ... - newTitle : ...
 
-                        File.AppendAllText(pathForLogs, selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldTitle : " + e.Title + " - newTitle : " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+                        File.AppendAllText(pathForLogs, selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " a été modifiée / oldTitle : " + e.Title + " - newTitle : " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
 
                         e.Title = selectedEntry.Strings.ReadSafe(PwDefs.TitleField); //on met à jour la oldEntriesList en cas de re-modification
                     }
@@ -133,7 +132,7 @@ namespace KeePass
                     {
                         // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldUserName : ... - newUserName : ...
 
-                        File.AppendAllText(pathForLogs, selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldUsername : " + e.UserName + " - newUsername : " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
+                        File.AppendAllText(pathForLogs, selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " a été modifiée / oldUsername : " + e.UserName + " - newUsername : " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
 
                         e.UserName = selectedEntry.Strings.ReadSafe(PwDefs.UserNameField); //on met à jour la oldEntriesList en cas de re-modification
                     }
@@ -141,7 +140,7 @@ namespace KeePass
                     {
                         // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldPassword : ... - newPassword : ...
 
-                        File.AppendAllText(pathForLogs, selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " à été modifié / oldPassword : " + e.Password + " - newPassword : " + selectedEntry.Strings.ReadSafe(PwDefs.PasswordField) + Environment.NewLine);
+                        File.AppendAllText(pathForLogs, selectedEntry.LastModificationTime + " L'entrée " + e.Uuid + " a été modifiée / oldPassword : " + e.Password + " - newPassword : " + selectedEntry.Strings.ReadSafe(PwDefs.PasswordField) + Environment.NewLine);
 
                         e.Password = selectedEntry.Strings.ReadSafe(PwDefs.PasswordField); //on met à jour la oldEntriesList en cas de re-modification
                     }
@@ -160,17 +159,63 @@ namespace KeePass
 
             if (oldEntriesList.Count() == lEntries.Count())
             {
-                MessageBox.Show(oldEntriesList.Count().ToString() +"\n"+ lEntries.Count().ToString());
+                //MessageBox.Show(oldEntriesList.Count().ToString() +" "+ lEntries.Count().ToString());
             }
-            else if(oldEntriesList.Count() < lEntries.Count())
+            else if(oldEntriesList.Count() < lEntries.Count()) //ajout d'un element
             {
-                //ajout d'un element
-                MessageBox.Show(oldEntriesList.Count().ToString() + "\n" + lEntries.Count().ToString());
+                int difFlag;
+                MessageBox.Show(oldEntriesList.Count().ToString() + " ajout " + lEntries.Count().ToString());
+                foreach(PwEntry el in lEntries)
+                {
+                    difFlag = 0;
+                    foreach(Entry oel in oldEntriesList)
+                    {
+                        if(el.Uuid.ToHexString() != oel.Uuid /*&& el.ParentGroup.Name != "Recycle Bin"*/)
+                        {
+                            difFlag += 1;
+                        }
+                    }
+                    if(difFlag > (lEntries.Count()-2))
+                    {
+                        File.AppendAllText(pathForLogs, el.LastModificationTime + " L'entrée " + el.Uuid.ToHexString() + " a été ajoutée à la base de donnée : " + el.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+                        oldEntriesList.Add(new Entry { Uuid = el.Uuid.ToHexString(), UserName = el.Strings.ReadSafe(PwDefs.UserNameField), Title = el.Strings.ReadSafe(PwDefs.TitleField), Password = el.Strings.ReadSafe(PwDefs.PasswordField) });
+                    }
+                }
             }
-            else if (oldEntriesList.Count() > lEntries.Count())
+            else if (oldEntriesList.Count() > lEntries.Count()) //suppression d'un element
             {
-                //suppression d'un element
-                MessageBox.Show(oldEntriesList.Count().ToString() + "\n" + lEntries.Count().ToString());
+                /*
+                int difFlag;
+                MessageBox.Show(oldEntriesList.Count().ToString() + " suppression " + lEntries.Count().ToString());
+                foreach (Entry oel in oldEntriesList)
+                {
+                    difFlag = 0;
+                    foreach (PwEntry el in lEntries)
+                    {
+                        if (el.Uuid.ToHexString() != oel.Uuid)
+                        {
+                            difFlag += 1;
+                        }
+                    }
+                    if (difFlag > (oldEntriesList.Count() - 2))
+                    {
+
+                        File.AppendAllText(pathForLogs, DateTime.Today.ToString("dd/MM/yyyy ") + " " + DateTime.Now.ToString("HH:mm:ss") + " L'entrée " + oel.Uuid + " à été supprimée de la base de donnée : " + oel.Title + Environment.NewLine);
+                    }
+                }
+                oldEntriesList = FindLastModEnt(m_host.Database);
+                */
+
+                /*
+                foreach(PwEntry el in lEntries)
+                {
+                    if(el.ParentGroup.Name == "Recycle Bin")
+                    {
+                        MessageBox.Show("une entrée est dans la recyclebin");
+                    }
+                }
+                */
+                //oldEntriesList = FindLastModEnt(m_host.Database);
             }
         }
 
@@ -178,19 +223,20 @@ namespace KeePass
         {
             if (e.Event.Type.Equals(CopiedEntryInfo))
             {
-                File.AppendAllText(pathForLogs, DateTime.Today.ToString("dd-MM-yyyy ") + " / " + DateTime.Now.ToString("HH:mm:ss") + " L'entrée suivante a été copiée dans le presse-papier : " + m_host.MainWindow.GetSelectedEntry(true).Uuid.ToHexString() + Environment.NewLine);
+                checkMaJ(oldEntriesList);
+                File.AppendAllText(pathForLogs, DateTime.Today.ToString("dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss") + " L'entrée suivante a été copiée dans le presse-papier : " + m_host.MainWindow.GetSelectedEntry(true).Uuid.ToHexString() + Environment.NewLine);
             }
             else if (e.Event.Type.Equals(OpenedDatabaseFile))
             {
                 //appel d'une fcontion qui enregistre l'etat actuel de la bdd
                 oldEntriesList = FindLastModEnt(m_host.Database);
 
-                File.AppendAllText(pathForLogs, DateTime.Today.ToString("dd-MM-yyyy ") + " / " + DateTime.Now.ToString("HH:mm:ss")  + "Ouverture de la Database" + Environment.NewLine);
+                File.AppendAllText(pathForLogs, DateTime.Today.ToString("dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss")  + " Ouverture de la Database" + Environment.NewLine);
             }
             else if (e.Event.Type.Equals(ClosingDatabaseFilePost))
             {
 
-                File.AppendAllText(pathForLogs, DateTime.Today.ToString("dd-MM-yyyy ") + " / " + DateTime.Now.ToString("HH:mm:ss") + "Fermeture de la Database" + Environment.NewLine);
+                File.AppendAllText(pathForLogs, DateTime.Today.ToString("dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss") + " Fermeture de la Database" + Environment.NewLine);
 
                 //recuperation de l'état actuel de la bdd + comparaison avec celle enregistrée à l'ouverture de la bdd pour voir les différences et les logger
                 EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true)); 
@@ -201,8 +247,8 @@ namespace KeePass
 
         private void OnSavedEntry(object sender, GwmWindowEventArgs e)
         {
-            EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true));
             checkMaJ(oldEntriesList);
+            EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true));
         }
 
         private void ChoosePath(object sender, EventArgs e)
@@ -261,3 +307,4 @@ namespace KeePass
         }
     }
 }
+ 
