@@ -170,7 +170,7 @@ namespace KeePass
                     difFlag = 0;
                     foreach(Entry oel in oldEntriesList)
                     {
-                        if(el.Uuid.ToHexString() != oel.Uuid /*&& el.ParentGroup.Name != "Recycle Bin"*/)
+                        if(el.Uuid.ToHexString() != oel.Uuid && el.ParentGroup.Name != "Recycle Bin")
                         {
                             difFlag += 1;
                         }
@@ -235,7 +235,7 @@ namespace KeePass
             }
             else if (e.Event.Type.Equals(ClosingDatabaseFilePost))
             {
-
+                checkMaJ(oldEntriesList);
                 File.AppendAllText(pathForLogs, DateTime.Today.ToString("dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss") + " Fermeture de la Database" + Environment.NewLine);
 
                 //recuperation de l'état actuel de la bdd + comparaison avec celle enregistrée à l'ouverture de la bdd pour voir les différences et les logger

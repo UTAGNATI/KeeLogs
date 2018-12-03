@@ -27,4 +27,3 @@ D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\obj\Debug\KeePass.csproj.CoreCom
 D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\obj\Debug\KeePass.csproj.CopyComplete
 D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\obj\Debug\KeePass.dll
 D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\obj\Debug\KeePass.pdb
-D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\obj\Debug\KeePass.csprojAssemblyReference.cache
