@@ -40,7 +40,7 @@ namespace KeePass
         private ToolStripMenuItem m_tsmiAddEntries = null;
         private ToolStripMenuItem EncryptLogs = null;
 
-        private string pathForLogs = @"D:\TAGNATI\source\Logs.txt";
+        private string pathForLogs = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
         private string passwordForLogs = "";
 
@@ -239,7 +239,7 @@ namespace KeePass
                 //appel d'une fcontion qui enregistre l'etat actuel de la bdd
                 oldEntriesList = FindLastModEnt(m_host.Database);
 
-                File.AppendAllText(pathForLogs, DateTime.Today.ToString("dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss")  + " Ouverture de la Database" + Environment.NewLine);
+                File.AppendAllText(pathForLogs, DateTime.Today.ToString("dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss")  + " Ouverture de la Database par" + Environment.MachineName + Environment.NewLine);
             }
             else if (e.Event.Type.Equals(ClosingDatabaseFilePost))
             {
@@ -279,8 +279,16 @@ namespace KeePass
             FileStream fs;
             try
             {
-                fs = new FileStream(Path.Combine(dialog.SelectedPath, "Logs.txt"), FileMode.Create);
-                pathForLogs = Path.Combine(dialog.SelectedPath, "Logs.txt");
+                fs = new FileStream(Path.Combine(dialog.SelectedPath, m_host.Database.Name + "_LOGS.txt"), FileMode.Create);
+
+                if (!Directory.Exists((dialog.SelectedPath + @"\KeePass Logs")))
+                    {
+                        Directory.CreateDirectory((dialog.SelectedPath + @"\KeePass Logs"));
+                    }
+
+                pathForLogs = System.IO.Path.Combine(dialog.SelectedPath, "KeePass Logs" + "\\" + m_host.Database.Name + "_LOGS.txt");
+
+                MessageBox.Show(pathForLogs);
             }
             catch (UnauthorizedAccessException ex)
             {
