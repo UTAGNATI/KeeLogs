@@ -12,12 +12,10 @@ using KeePass.UI;
 using KeePass.Util;
 using KeePassLib;
 using KeePass.Ecas;
-using KeePass.Plugins;
-using KeePass.Util;
-
-using KeePassLib;
 using KeePassLib.Collections;
 using KeePassLib.Utility;
+using System.Security.Cryptography;
+using System.Runtime.InteropServices;
 
 namespace KeePass
 {
@@ -38,10 +36,13 @@ namespace KeePass
 
         private ToolStripSeparator m_tsSeparator = null;
         private ToolStripMenuItem m_tsmiPopup = null;
-        private ToolStripMenuItem m_tsmiAddGroups = null;
+        private ToolStripMenuItem PathLogs = null;
         private ToolStripMenuItem m_tsmiAddEntries = null;
+        private ToolStripMenuItem EncryptLogs = null;
 
         private string pathForLogs = @"D:\TAGNATI\source\Logs.txt";
+
+        private string passwordForLogs = "";
 
         public static readonly PwUuid OpenedDatabaseFile = new PwUuid(new byte[] {
             0xE5, 0xFF, 0x13, 0x06, 0x85, 0xB8, 0x41, 0x89,
@@ -73,11 +74,18 @@ namespace KeePass
             m_tsmiPopup.Text = "FormindPlugin";
             tsMenu.Add(m_tsmiPopup);
 
-            // Add menu item 'Add Some Groups'
-            m_tsmiAddGroups = new ToolStripMenuItem();
-            m_tsmiAddGroups.Text = "Choisir l'emplacement des Logs";
-            m_tsmiAddGroups.Click += ChoosePath;
-            m_tsmiPopup.DropDownItems.Add(m_tsmiAddGroups);
+            // Add menu item 'PathLogs'
+            PathLogs = new ToolStripMenuItem();
+            PathLogs.Text = "Choisir l'emplacement des Logs";
+            PathLogs.Click += ChoosePath;
+            m_tsmiPopup.DropDownItems.Add(PathLogs);
+
+            // Add menu item 'Encrypt Logs'
+
+            EncryptLogs = new ToolStripMenuItem();
+            EncryptLogs.Text = "Chiffrer les Logs";
+            EncryptLogs.Click += ChooseEncryptionKeyForLogs;
+            m_tsmiPopup.DropDownItems.Add(EncryptLogs);
 
             m_host.TriggerSystem.RaisingEvent += this.OnEcasEvent;
             //m_host.MainWindow.GetSelectedEntry(true).Touched += this.OnSavedEntry; je comprend pas comment Touched focntionne
@@ -282,6 +290,17 @@ namespace KeePass
 
         }
 
+        private void ChooseEncryptionKeyForLogs(object sender, EventArgs e)
+        {
+           // MessageBox.Show("Entrez le mot de passe avec lequel les Logs seront chiffrés");
+
+            TextBox PasswordBox = new TextBox();
+            PasswordBox.TextAlign = HorizontalAlignment.Center;
+            PasswordBox.UseSystemPasswordChar = true;
+
+            passwordForLogs = PasswordBox.Text;
+        }
+
         public override void Terminate()
         {
 
@@ -289,8 +308,9 @@ namespace KeePass
             ToolStripItemCollection tsMenu = m_host.MainWindow.ToolsMenu.DropDownItems;
             tsMenu.Remove(m_tsSeparator);
             tsMenu.Remove(m_tsmiPopup);
-            tsMenu.Remove(m_tsmiAddGroups);
+            tsMenu.Remove(PathLogs);
             tsMenu.Remove(m_tsmiAddEntries);
+            tsMenu.Remove(EncryptLogs);
 
             // Important! Remove event handlers!
             m_host.MainWindow.FileSaved -= OnFileSaved;
