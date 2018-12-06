@@ -40,6 +40,7 @@ namespace KeePass
         private ToolStripMenuItem m_tsmiAddEntries = null;
         private ToolStripMenuItem EncryptLogs = null;
 
+        //private string pathForLogs = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         private string pathForLogs = @"D:\TAGNATI\source\Logs.txt";
 
         private string passwordForLogs = "";
@@ -81,7 +82,6 @@ namespace KeePass
             m_tsmiPopup.DropDownItems.Add(PathLogs);
 
             // Add menu item 'Encrypt Logs'
-
             EncryptLogs = new ToolStripMenuItem();
             EncryptLogs.Text = "Chiffrer les Logs";
             EncryptLogs.Click += ChooseEncryptionKeyForLogs;
@@ -279,7 +279,7 @@ namespace KeePass
             FileStream fs;
             try
             {
-                fs = new FileStream(Path.Combine(dialog.SelectedPath, "Logs.txt"), FileMode.Create);
+                fs = new FileStream(Path.Combine(dialog.SelectedPath, "Logs.txt"), FileMode.Create, FileAccess.ReadWrite);
                 pathForLogs = Path.Combine(dialog.SelectedPath, "Logs.txt");
             }
             catch (UnauthorizedAccessException ex)
@@ -294,11 +294,13 @@ namespace KeePass
         {
            // MessageBox.Show("Entrez le mot de passe avec lequel les Logs seront chiffrés");
 
-            TextBox PasswordBox = new TextBox();
-            PasswordBox.TextAlign = HorizontalAlignment.Center;
-            PasswordBox.UseSystemPasswordChar = true;
+            TextBox pwdBox = new System.Windows.Forms.TextBox();
+            pwdBox.AcceptsReturn = true;
+            pwdBox.AcceptsTab = true;
+            pwdBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            pwdBox.Text = "tottoot0";
 
-            passwordForLogs = PasswordBox.Text;
+            passwordForLogs = pwdBox.Text;
         }
 
         public override void Terminate()
