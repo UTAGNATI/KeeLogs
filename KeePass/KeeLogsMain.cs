@@ -48,6 +48,8 @@ namespace KeeLogs
 
         private string passwordForLogs = "password";
 
+        private string LogsName = Environment.MachineName + "_LOGS.txt";
+
         public static readonly PwUuid OpenedDatabaseFile = new PwUuid(new byte[] {
             0xE5, 0xFF, 0x13, 0x06, 0x85, 0xB8, 0x41, 0x89,
             0xB9, 0x06, 0xF6, 0x9E, 0x2B, 0x3B, 0x40, 0xA7
@@ -140,7 +142,7 @@ namespace KeeLogs
 
                         if (pathForLogs == @"")
                         {
-                            File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " L'entrée a été modifiée " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " / oldTitle : " + e.Title + " - newTitle : " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+                            File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + LogsName, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " L'entrée a été modifiée " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " / oldTitle : " + e.Title + " - newTitle : " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
                         } 
 
                         else
@@ -156,7 +158,7 @@ namespace KeeLogs
                         // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldUserName : ... - newUserName : ...
                         if (pathForLogs == @"")
                         {
-                            File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " L'entrée a été modifiée " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + " / oldUsername : " + e.UserName + " - newUsername : " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
+                            File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + LogsName, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " L'entrée a été modifiée " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + " / oldUsername : " + e.UserName + " - newUsername : " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
                         }
 
                         else
@@ -172,7 +174,7 @@ namespace KeeLogs
                         // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldPassword : ... - newPassword : ...
                         if (pathForLogs == @"")
                         {
-                            File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " L'entrée a été modifiée "+ selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " / oldPassword : " + e.Password + " - newPassword : " + selectedEntry.Strings.ReadSafe(PwDefs.PasswordField) + Environment.NewLine);
+                            File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + LogsName, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " L'entrée a été modifiée "+ selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " / oldPassword : " + e.Password + " - newPassword : " + selectedEntry.Strings.ReadSafe(PwDefs.PasswordField) + Environment.NewLine);
                         }
 
                         else
@@ -218,7 +220,7 @@ namespace KeeLogs
                     {
                         if (pathForLogs == @"")
                         {
-                            File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + el.Uuid.ToHexString() + " L'entrée a été ajoutée à la base de donnée : Title - " + el.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+                            File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + LogsName, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + el.Uuid.ToHexString() + " L'entrée a été ajoutée à la base de donnée : Title - " + el.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
                         }
 
                         else
@@ -243,7 +245,7 @@ namespace KeeLogs
                 checkMaJ(oldEntriesList);
                 if (pathForLogs == @"")
                 {
-                    File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + m_host.MainWindow.GetSelectedEntry(true).Uuid.ToHexString() + " L'entrée a été copiée dans le presse-papier : Title - " + m_host.MainWindow.GetSelectedEntry(true).Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+                    File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + LogsName, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + m_host.MainWindow.GetSelectedEntry(true).Uuid.ToHexString() + " L'entrée a été copiée dans le presse-papier : Title - " + m_host.MainWindow.GetSelectedEntry(true).Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
                 }
 
                 else
@@ -258,7 +260,7 @@ namespace KeeLogs
                 oldEntriesList = FindLastModEnt(m_host.Database);
                 if (pathForLogs == @"")
                 {
-                    File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Ouverture de la Database par " + Environment.MachineName + Environment.NewLine);
+                    File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + LogsName, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Ouverture de la Database par " + Environment.MachineName + Environment.NewLine);
                 }
 
                 else
@@ -271,12 +273,12 @@ namespace KeeLogs
                 checkMaJ(oldEntriesList);
                 if (pathForLogs == @"")
                 {
-                    File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Fermeture de la Database par " + Environment.MachineName + Environment.NewLine);
+                    File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + LogsName, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Fermeture de la Database par " + Environment.MachineName + Environment.NewLine);
 
                     using (ZipFile zip = new ZipFile())
                     {
                         zip.Password = passwordForLogs;
-                        zip.AddFile(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt");
+                        zip.AddFile(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + LogsName);
                         zip.Save(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + ".zip");
                     }
                 }
@@ -288,8 +290,8 @@ namespace KeeLogs
                     using (ZipFile zip = new ZipFile())
                     {
                         zip.Password = passwordForLogs;
-                        zip.AddFile(pathForLogs + Environment.MachineName + "_LOGS.txt");
-                        zip.Save(pathForLogs + Environment.MachineName + ".zip");
+                        zip.AddFile(pathForLogs);
+                        zip.Save(pathForLogs + ".zip");
                     }
                 }
 
@@ -326,18 +328,19 @@ namespace KeeLogs
             FileStream fs;
             try
             {
-                fs = new FileStream(Path.Combine(dialog.SelectedPath, m_host.Database.Name + "_LOGS.txt"), FileMode.Create);
+                fs = new FileStream(Path.Combine(dialog.SelectedPath, LogsName), FileMode.Create);
 
                 //     if (!Directory.Exists((dialog.SelectedPath + @"\KeePass Logs")))
                 //       {
                 //         Directory.CreateDirectory((dialog.SelectedPath + @"\KeePass Logs"));
                 //   }
 
-                pathForLogs = System.IO.Path.Combine(dialog.SelectedPath, m_host.Database.Name + "_LOGS.txt");
+                pathForLogs = System.IO.Path.Combine(dialog.SelectedPath, LogsName);
                 //pathForLogs = System.IO.Path.Combine(dialog.SelectedPath, "KeePass Logs" + "\\" + m_host.Database.Name + "_LOGS.txt");
+                fs.Close();
 
 
-                MessageBox.Show(pathForLogs);
+                MessageBox.Show("Les logs d'utilisation du logiciel seront sauvegardés ici:" + pathForLogs);
             }
             catch (UnauthorizedAccessException ex)
             {
