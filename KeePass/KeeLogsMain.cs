@@ -16,6 +16,9 @@ using KeePassLib.Collections;
 using KeePassLib.Utility;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices;
+using Ionic.Zip;
+using System.IO.Compression;
+
 
 namespace KeeLogs
 {
@@ -43,7 +46,7 @@ namespace KeeLogs
         //private string pathForLogs = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         private string pathForLogs;
 
-        private string passwordForLogs = "";
+        private string passwordForLogs = "password";
 
         public static readonly PwUuid OpenedDatabaseFile = new PwUuid(new byte[] {
             0xE5, 0xFF, 0x13, 0x06, 0x85, 0xB8, 0x41, 0x89,
@@ -64,7 +67,7 @@ namespace KeeLogs
         {
             if (host == null) return false;
             m_host = host;
-            pathForLogs = @"D:\TAGNATI\source\" + m_host.Database.Name + "_LOGS.txt";
+            pathForLogs = @"";
 
 
             ToolStripItemCollection tsMenu = m_host.MainWindow.ToolsMenu.DropDownItems;
@@ -269,11 +272,25 @@ namespace KeeLogs
                 if (pathForLogs == @"")
                 {
                     File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Fermeture de la Database par " + Environment.MachineName + Environment.NewLine);
+
+                    using (ZipFile zip = new ZipFile())
+                    {
+                        zip.Password = passwordForLogs;
+                        zip.AddFile(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt");
+                        zip.Save(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + ".zip");
+                    }
                 }
 
                 else
                 {
                     File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Fermeture de la Database par " + Environment.MachineName + Environment.NewLine);
+
+                    using (ZipFile zip = new ZipFile())
+                    {
+                        zip.Password = passwordForLogs;
+                        zip.AddFile(pathForLogs + Environment.MachineName + "_LOGS.txt");
+                        zip.Save(pathForLogs + Environment.MachineName + ".zip");
+                    }
                 }
 
                 //recuperation de l'état actuel de la bdd + comparaison avec celle enregistrée à l'ouverture de la bdd pour voir les différences et les logger
@@ -311,12 +328,14 @@ namespace KeeLogs
             {
                 fs = new FileStream(Path.Combine(dialog.SelectedPath, m_host.Database.Name + "_LOGS.txt"), FileMode.Create);
 
-                if (!Directory.Exists((dialog.SelectedPath + @"\KeePass Logs")))
-                    {
-                        Directory.CreateDirectory((dialog.SelectedPath + @"\KeePass Logs"));
-                    }
+                //     if (!Directory.Exists((dialog.SelectedPath + @"\KeePass Logs")))
+                //       {
+                //         Directory.CreateDirectory((dialog.SelectedPath + @"\KeePass Logs"));
+                //   }
 
-                pathForLogs = System.IO.Path.Combine(dialog.SelectedPath, "KeePass Logs" + "\\" + m_host.Database.Name + "_LOGS.txt");
+                pathForLogs = System.IO.Path.Combine(dialog.SelectedPath, m_host.Database.Name + "_LOGS.txt");
+                //pathForLogs = System.IO.Path.Combine(dialog.SelectedPath, "KeePass Logs" + "\\" + m_host.Database.Name + "_LOGS.txt");
+
 
                 MessageBox.Show(pathForLogs);
             }
