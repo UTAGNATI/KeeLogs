@@ -41,7 +41,7 @@ namespace KeePass
         private ToolStripMenuItem EncryptLogs = null;
 
         //private string pathForLogs = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-        private string pathForLogs = @"D:\TAGNATI\source\LOGS.txt";
+        private string pathForLogs = @"";
 
 
         private string passwordForLogs = "";
@@ -134,23 +134,48 @@ namespace KeePass
                     {
                         // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid a été modifié / oldTitle : ... - newTitle : ...
 
-                        File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été modifiée / oldTitle : " + e.Title + " - newTitle : " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+                        if (pathForLogs == @"")
+                        {
+                            File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été modifiée / oldTitle : " + e.Title + " - newTitle : " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+                        } 
+
+                        else
+                        {
+                            File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été modifiée / oldTitle : " + e.Title + " - newTitle : " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+
+                        }
 
                         e.Title = selectedEntry.Strings.ReadSafe(PwDefs.TitleField); //on met à jour la oldEntriesList en cas de re-modification
                     }
                     if (e.UserName != selectedEntry.Strings.ReadSafe(PwDefs.UserNameField))
                     {
                         // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldUserName : ... - newUserName : ...
+                        if (pathForLogs == @"")
+                        {
+                            File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été modifiée / oldUsername : " + e.UserName + " - newUsername : " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
+                        }
 
-                        File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été modifiée / oldUsername : " + e.UserName + " - newUsername : " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
+                        else
+                        {
+                            File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été modifiée / oldUsername : " + e.UserName + " - newUsername : " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
+
+                        }
 
                         e.UserName = selectedEntry.Strings.ReadSafe(PwDefs.UserNameField); //on met à jour la oldEntriesList en cas de re-modification
                     }
                     if (e.Password != selectedEntry.Strings.ReadSafe(PwDefs.PasswordField)) //à modifier pour ne pas mettre le mdp en clair dans les logs
                     {
                         // genere un log disant que l'entrée en question a été modifiée sous la forme "pe.LasModificationTime L'entrée e.Uuid.ToHexString() a été modifié / oldPassword : ... - newPassword : ...
+                        if (pathForLogs == @"")
+                        {
+                            File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été modifiée / oldPassword : " + e.Password + " - newPassword : " + selectedEntry.Strings.ReadSafe(PwDefs.PasswordField) + Environment.NewLine);
+                        }
 
-                        File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été modifiée / oldPassword : " + e.Password + " - newPassword : " + selectedEntry.Strings.ReadSafe(PwDefs.PasswordField) + Environment.NewLine);
+                        else
+                        {
+                            File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été modifiée / oldPassword : " + e.Password + " - newPassword : " + selectedEntry.Strings.ReadSafe(PwDefs.PasswordField) + Environment.NewLine);
+
+                        }
 
                         e.Password = selectedEntry.Strings.ReadSafe(PwDefs.PasswordField); //on met à jour la oldEntriesList en cas de re-modification
                     }
@@ -187,7 +212,16 @@ namespace KeePass
                     }
                     if(difFlag > (lEntries.Count()-2))
                     {
-                        File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + el.Uuid.ToHexString() + " " + el.Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été ajoutée à la base de donnée" + Environment.NewLine);
+                        if (pathForLogs == @"")
+                        {
+                            File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + el.Uuid.ToHexString() + " " + el.Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été ajoutée à la base de donnée" + Environment.NewLine);
+                        }
+
+                        else
+                        {
+                            File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + el.Uuid.ToHexString() + " " + el.Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été ajoutée à la base de donnée" + Environment.NewLine);
+
+                        }
                         oldEntriesList.Add(new Entry { Uuid = el.Uuid.ToHexString(), UserName = el.Strings.ReadSafe(PwDefs.UserNameField), Title = el.Strings.ReadSafe(PwDefs.TitleField), Password = el.Strings.ReadSafe(PwDefs.PasswordField) });
                     }
                 }
@@ -234,19 +268,43 @@ namespace KeePass
             if (e.Event.Type.Equals(CopiedEntryInfo))
             {
                 checkMaJ(oldEntriesList);
-                File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + m_host.MainWindow.GetSelectedEntry(true).Uuid.ToHexString() + " " + m_host.MainWindow.GetSelectedEntry(true).Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été copiée dans le presse-papie" + Environment.NewLine);
+                if (pathForLogs == @"")
+                {
+                    File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + m_host.MainWindow.GetSelectedEntry(true).Uuid.ToHexString() + " " + m_host.MainWindow.GetSelectedEntry(true).Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été copiée dans le presse-papie" + Environment.NewLine);
+                }
+
+                else
+                {
+                    File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + m_host.MainWindow.GetSelectedEntry(true).Uuid.ToHexString() + " " + m_host.MainWindow.GetSelectedEntry(true).Strings.ReadSafe(PwDefs.TitleField) + " L'entrée a été copiée dans le presse-papie" + Environment.NewLine);
+
+                }
             }
             else if (e.Event.Type.Equals(OpenedDatabaseFile))
             {
                 //appel d'une fcontion qui enregistre l'etat actuel de la bdd
                 oldEntriesList = FindLastModEnt(m_host.Database);
+                if (pathForLogs == @"")
+                {
+                    File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Ouverture de la Database par " + Environment.MachineName + Environment.NewLine);
+                }
 
-                File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ")  + " Ouverture de la Database par " + Environment.MachineName + Environment.NewLine);
+                else
+                {
+                    File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Ouverture de la Database par " + Environment.MachineName + Environment.NewLine);
+                }
             }
             else if (e.Event.Type.Equals(ClosingDatabaseFilePost))
             {
                 checkMaJ(oldEntriesList);
-                File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Fermeture de la Database par "  + Environment.MachineName + Environment.NewLine);
+                if (pathForLogs == @"")
+                {
+                    File.AppendAllText(@"C:\Program Files (x86)\KeePass Password Safe 2\Plugins\" + Environment.MachineName + "_LOGS.txt", DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Fermeture de la Database par " + Environment.MachineName + Environment.NewLine);
+                }
+
+                else
+                {
+                    File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Fermeture de la Database par " + Environment.MachineName + Environment.NewLine);
+                }
 
                 //recuperation de l'état actuel de la bdd + comparaison avec celle enregistrée à l'ouverture de la bdd pour voir les différences et les logger
                 EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true)); 
