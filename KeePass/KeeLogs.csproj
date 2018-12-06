@@ -7,8 +7,8 @@
     <ProjectGuid>{32BDD5D9-5EDD-4F46-BE87-20BF46DE605D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KeePass</RootNamespace>
-    <AssemblyName>KeePass</AssemblyName>
+    <RootNamespace>KeeLogs</RootNamespace>
+    <AssemblyName>KeeLogs</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -47,7 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="KeeLogsMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

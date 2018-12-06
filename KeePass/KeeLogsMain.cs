@@ -17,9 +17,9 @@ using KeePassLib.Utility;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices;
 
-namespace KeePass
+namespace KeeLogs
 {
-    public sealed class KeePassExt : Plugin
+    public sealed class KeeLogsExt : Plugin
     {
         private IPluginHost m_host = null;
 
@@ -194,38 +194,7 @@ namespace KeePass
             }
             else if (oldEntriesList.Count() > lEntries.Count()) //suppression d'un element
             {
-                /*
-                int difFlag;
-                MessageBox.Show(oldEntriesList.Count().ToString() + " suppression " + lEntries.Count().ToString());
-                foreach (Entry oel in oldEntriesList)
-                {
-                    difFlag = 0;
-                    foreach (PwEntry el in lEntries)
-                    {
-                        if (el.Uuid.ToHexString() != oel.Uuid)
-                        {
-                            difFlag += 1;
-                        }
-                    }
-                    if (difFlag > (oldEntriesList.Count() - 2))
-                    {
-
-                        File.AppendAllText(pathForLogs, DateTime.Today.ToString("dd/MM/yyyy ") + " " + DateTime.Now.ToString("HH:mm:ss") + " L'entrée " + oel.Uuid + " à été supprimée de la base de donnée : " + oel.Title + Environment.NewLine);
-                    }
-                }
-                oldEntriesList = FindLastModEnt(m_host.Database);
-                */
-
-                /*
-                foreach(PwEntry el in lEntries)
-                {
-                    if(el.ParentGroup.Name == "Recycle Bin")
-                    {
-                        MessageBox.Show("une entrée est dans la recyclebin");
-                    }
-                }
-                */
-                //oldEntriesList = FindLastModEnt(m_host.Database);
+              
             }
         }
 
