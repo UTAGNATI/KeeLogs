@@ -60,14 +60,22 @@ namespace KeeLogs
             0x95, 0x44, 0x85, 0xFB, 0xF2, 0x6F, 0x56, 0xDC
         });
 
+        private KeeLogs.KeeLogsExt m_funcs = null;
+
+        public IPluginHost Host
+        {
+            get { return m_host; }
+        }
+
         public override bool Initialize(IPluginHost host)
         {
             if (host == null) return false;
             m_host = host;
             pathForLogs = @"D:\TAGNATI\source\" + m_host.Database.Name + "_LOGS.txt";
 
-
             ToolStripItemCollection tsMenu = m_host.MainWindow.ToolsMenu.DropDownItems;
+
+            m_funcs = new KeeLogs.KeeLogsExt(host);
 
             m_tsSeparator = new ToolStripSeparator();
             tsMenu.Add(m_tsSeparator);
@@ -97,6 +105,19 @@ namespace KeeLogs
             //GlobalWindowManager.WindowAdded +=; //trouver comment savoir si c'est une fenetre d'ajout qui vient de s'ouvirir
 
             return true;
+        }
+
+        public KeeLogsExt(IPluginHost host)
+        {
+            m_host = host;
+            SetupOptions();
+        }
+
+        private Properties.Options m_Options = null;
+
+        public void SetupOptions()
+        {
+            m_Options = new KeeLogs.Properties.Options(m_host);
         }
 
         //Permet d'enregistrer les dates de modification de toutes les entrées ainsi que toutes les valeurs des champs
@@ -330,13 +351,27 @@ namespace KeeLogs
 
         private void ChooseEncryptionKeyForLogs(object sender, EventArgs e)
         {
-           // MessageBox.Show("Entrez le mot de passe avec lequel les Logs seront chiffrés");
+            KeeLogs.Forms.PasswordForm pfDlg = new KeeLogs.Forms.PasswordForm();
+            pfDlg.InitEx(m_funcs.Host);
 
-            TextBox PasswordBox = new TextBox();
-            PasswordBox.TextAlign = HorizontalAlignment.Center;
-            PasswordBox.UseSystemPasswordChar = true;
+            if (pfDlg.ShowDialog() == DialogResult.OK)
+            {
+                m_funcs.SetupOptions();
+               
+            }
+        }
 
-            passwordForLogs = PasswordBox.Text;
+        private void OnToolsOptions(object sender, EventArgs e)
+        {
+            KeeLogs.Forms.PasswordForm ofDlg = new KeeLogs.Forms.PasswordForm();
+            ofDlg.InitEx(m_funcs.Host);
+
+            if (ofDlg.ShowDialog() == DialogResult.OK)
+            {
+                m_funcs.SetupOptions();
+               
+            }
+
         }
 
         public override void Terminate()
