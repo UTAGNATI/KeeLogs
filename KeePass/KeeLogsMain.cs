@@ -69,7 +69,8 @@ namespace KeeLogs
         {
             if (host == null) return false;
             m_host = host;
-            pathForLogs = @"";
+            pathForLogs = @"D:\TAGNATI\source\LOGS.txt";
+            
 
 
             ToolStripItemCollection tsMenu = m_host.MainWindow.ToolsMenu.DropDownItems;
