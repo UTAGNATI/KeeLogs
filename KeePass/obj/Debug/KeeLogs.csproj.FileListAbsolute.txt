@@ -10,3 +10,15 @@ D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\obj\Debug\KeeLogs.csproj.CoreCom
 D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\obj\Debug\KeeLogs.csproj.CopyComplete
 D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\obj\Debug\KeeLogs.dll
 D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\obj\Debug\KeeLogs.pdb
+C:\Users\smchn\Desktop\KeeLogs-master\KeePass\bin\Debug\KeeLogs.dll
+C:\Users\smchn\Desktop\KeeLogs-master\KeePass\bin\Debug\KeeLogs.pdb
+C:\Users\smchn\Desktop\KeeLogs-master\KeePass\bin\Debug\DotNetZip.dll
+C:\Users\smchn\Desktop\KeeLogs-master\KeePass\bin\Debug\KeePass.exe
+C:\Users\smchn\Desktop\KeeLogs-master\KeePass\bin\Debug\DotNetZip.xml
+C:\Users\smchn\Desktop\KeeLogs-master\KeePass\bin\Debug\KeePass.exe.config
+C:\Users\smchn\Desktop\KeeLogs-master\KeePass\bin\Debug\KeePass.XmlSerializers.dll
+C:\Users\smchn\Desktop\KeeLogs-master\KeePass\obj\Debug\KeeLogs.csproj.CoreCompileInputs.cache
+C:\Users\smchn\Desktop\KeeLogs-master\KeePass\obj\Debug\KeeLogs.csproj.CopyComplete
+C:\Users\smchn\Desktop\KeeLogs-master\KeePass\obj\Debug\KeeLogs.dll
+C:\Users\smchn\Desktop\KeeLogs-master\KeePass\obj\Debug\KeeLogs.pdb
+C:\Users\smchn\Desktop\KeeLogs-master\KeePass\obj\Debug\KeeLogs.csprojAssemblyReference.cache
