@@ -18,6 +18,7 @@ using System.Security.Cryptography;
 using System.Runtime.InteropServices;
 using Ionic.Zip;
 using System.IO.Compression;
+using System.Timers;
 
 
 namespace KeeLogs
@@ -47,7 +48,9 @@ namespace KeeLogs
 
         private string passwordForLogs = "password";
 
-        private static string LogsName = Environment.MachineName + "_LOGS.txt";
+        private static System.Timers.Timer newTimer;
+
+        private static string LogsName = (DateTime.Today.ToString("[ dd/MM/yyyy ") + Environment.MachineName + "_LOGS.txt").Replace('/', '-');
 
         private string pathForLogs = Path.Combine(Environment.CurrentDirectory, LogsName);
 
@@ -164,10 +167,10 @@ namespace KeeLogs
             }
         }
 
-        internal void checkMaJ(IList<Entry> oldEntriesList) 
+        internal void checkMaJ(IList<Entry> oldEntriesList)
         {
             if (!m_host.Database.IsOpen)
-            {      
+            {
                 return;
             }
 
@@ -177,33 +180,34 @@ namespace KeeLogs
             {
                 //MessageBox.Show(oldEntriesList.Count().ToString() +" "+ lEntries.Count().ToString());
             }
-            else if(oldEntriesList.Count() < lEntries.Count()) //ajout d'un element
+            else if (oldEntriesList.Count() < lEntries.Count()) //ajout d'un element
             {
                 int difFlag;
                 MessageBox.Show(oldEntriesList.Count().ToString() + " ajout " + lEntries.Count().ToString());
-                foreach(PwEntry el in lEntries)
+                foreach (PwEntry el in lEntries)
                 {
                     difFlag = 0;
-                    foreach(Entry oel in oldEntriesList)
+                    foreach (Entry oel in oldEntriesList)
                     {
-                        if(el.Uuid.ToHexString() != oel.Uuid && el.ParentGroup.Name != "Recycle Bin")
+                        if (el.Uuid.ToHexString() != oel.Uuid && el.ParentGroup.Name != "Recycle Bin")
                         {
                             difFlag += 1;
                         }
                     }
-                    if(difFlag > (lEntries.Count()-2))
-                    {                                    
-                        File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + el.Uuid.ToHexString() + " L'entrée a été ajoutée à la base de donnée : Title - " + el.Strings.ReadSafe(PwDefs.TitleField)+ Environment.NewLine);
-                        
+                    if (difFlag > (lEntries.Count() - 2))
+                    {
+                        File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + el.Uuid.ToHexString() + " L'entrée a été ajoutée à la base de donnée : Title - " + el.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+
                         oldEntriesList.Add(new Entry { Uuid = el.Uuid.ToHexString(), UserName = el.Strings.ReadSafe(PwDefs.UserNameField), Title = el.Strings.ReadSafe(PwDefs.TitleField), Password = el.Strings.ReadSafe(PwDefs.PasswordField) });
                     }
                 }
             }
             else if (oldEntriesList.Count() > lEntries.Count()) //suppression d'un element
             {
-              
+
             }
         }
+
 
         private void OnEcasEvent(object sender, EcasRaisingEventArgs e)
         {
@@ -221,27 +225,42 @@ namespace KeeLogs
             else if (e.Event.Type.Equals(ClosingDatabaseFilePost))
             {
                 checkMaJ(oldEntriesList);
-                
-                    File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Fermeture de la Database par " + Environment.MachineName + Environment.NewLine);
 
-                    using (ZipFile zip = new ZipFile())
-                    {
-                        zip.Password = passwordForLogs;
-                        zip.AddFile(pathForLogs);
-                        zip.Save(pathForLogs + ".zip");
-                    }
+                File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Fermeture de la Database par " + Environment.MachineName + Environment.NewLine);
+
+                using (ZipFile zip = new ZipFile())
+                {
+                    zip.Password = passwordForLogs;
+                    zip.AddFile(pathForLogs);
+                    zip.Save(pathForLogs + ".zip");
+                }
 
                 //recuperation de l'état actuel de la bdd + comparaison avec celle enregistrée à l'ouverture de la bdd pour voir les différences et les logger
-                EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true)); 
+                EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true));
 
                 //reste encore à log les ajouts et suppressions d'entrées
             }
         }
 
+        private void SetTimer()
+        {
+            newTimer = new System.Timers.Timer(3000);
+            newTimer.Elapsed += OnTimedEvent;
+            newTimer.Enabled = true;
+        }
+
         private void OnSavedEntry(object sender, GwmWindowEventArgs e)
+        {
+            SetTimer();
+        }
+
+        private void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
             checkMaJ(oldEntriesList);
             EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true));
+            //MessageBox.Show("3 secondes se sont ecoulée");
+            newTimer.Stop();
+            //newTimer.Dispose();
         }
 
         private void ChoosePath(object sender, EventArgs e)
