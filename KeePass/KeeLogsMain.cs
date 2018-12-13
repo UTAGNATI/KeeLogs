@@ -17,7 +17,7 @@ using KeePassLib.Utility;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices;
 using System.IO.Compression;
-//using Ionic.Zip;
+using System.Timers;
 
 
 
@@ -45,11 +45,16 @@ namespace KeeLogs
         private ToolStripMenuItem EncryptLogs = null;
 
         //private string pathForLogs = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-        private string pathForLogs = @"";
+        private string pathForLogs = @"D:\TAGNATI\source\LOGS.txt";
+        //@"D:\TAGNATI\source\LOGS.txt";
 
-        //private string passwordForLogs = "password";
+        private string passwordForLogs = "password";
 
-        private string LogsName = (DateTime.Today.ToString("[ dd/MM/yyyy ") + Environment.MachineName + "_LOGS.txt").Replace('/','-');
+        //private static System.Timers.Timer newTimer;
+
+        //private string LogsName = (DateTime.Today.ToString("[ dd/MM/yyyy ] ") + Environment.MachineName + "_LOGS.txt").Replace('/','-');
+        private string LogsName = "";
+            // (Environment.MachineName + "_LOGS.txt").Replace('/', '-');
 
         public static readonly PwUuid OpenedDatabaseFile = new PwUuid(new byte[] {
             0xE5, 0xFF, 0x13, 0x06, 0x85, 0xB8, 0x41, 0x89,
@@ -69,10 +74,7 @@ namespace KeeLogs
         public override bool Initialize(IPluginHost host)
         {
             if (host == null) return false;
-            m_host = host;
-            pathForLogs = @"D:\TAGNATI\source\LOGS.txt";
-            
-
+                m_host = host;
 
             ToolStripItemCollection tsMenu = m_host.MainWindow.ToolsMenu.DropDownItems;
 
@@ -100,8 +102,7 @@ namespace KeeLogs
             //m_host.TriggerSystem.RaisingEvent += this.OnEcasEvent;
             //m_host.MainWindow.GetSelectedEntry(true).Touched += this.OnSavedEntry; je comprend pas comment Touched focntionne
 
-            GlobalWindowManager.WindowRemoved += this.OnSavedEntry; //eventhandler sur la fermeture d'une fenetre quelconque (pas seulement une fenetre de modification d'entrée !!!)
-            //GlobalWindowManager.WindowAdded +=; //trouver comment savoir si c'est une fenetre d'ajout qui vient de s'ouvirir
+            ////////////////////////GlobalWindowManager.WindowRemoved += this.OnSavedEntry; //eventhandler sur la fermeture d'une fenetre quelconque (pas seulement une fenetre de modification d'entrée !!!)
 
             return true;
         }
@@ -149,7 +150,7 @@ namespace KeeLogs
 
                         else
                         {
-                            File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " L'entrée a été modifiée " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " / oldTitle : " + e.Title + " - newTitle : " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+                            File.AppendAllText(pathForLogs + LogsName, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " L'entrée a été modifiée " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + " / oldTitle : " + e.Title + " - newTitle : " + selectedEntry.Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
 
                         }
 
@@ -165,7 +166,7 @@ namespace KeeLogs
 
                         else
                         {
-                            File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " L'entrée a été modifiée " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + " / oldUsername : " + e.UserName + " - newUsername : " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
+                            File.AppendAllText(pathForLogs + LogsName, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + e.Uuid + " L'entrée a été modifiée " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + " / oldUsername : " + e.UserName + " - newUsername : " + selectedEntry.Strings.ReadSafe(PwDefs.UserNameField) + Environment.NewLine);
 
                         }
 
@@ -228,7 +229,7 @@ namespace KeeLogs
 
                         else
                         {
-                            File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + el.Uuid.ToHexString() + " L'entrée a été ajoutée à la base de donnée : Title - " + el.Strings.ReadSafe(PwDefs.TitleField)+ Environment.NewLine);
+                            File.AppendAllText(pathForLogs + LogsName, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + el.Uuid.ToHexString() + " L'entrée a été ajoutée à la base de donnée : Title - " + el.Strings.ReadSafe(PwDefs.TitleField)+ Environment.NewLine);
 
                         }
                         oldEntriesList.Add(new Entry { Uuid = el.Uuid.ToHexString(), UserName = el.Strings.ReadSafe(PwDefs.UserNameField), Title = el.Strings.ReadSafe(PwDefs.TitleField), Password = el.Strings.ReadSafe(PwDefs.PasswordField) });
@@ -253,7 +254,7 @@ namespace KeeLogs
 
                 else
                 {
-                    File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + m_host.MainWindow.GetSelectedEntry(true).Uuid.ToHexString() + " L'entrée a été copiée dans le presse-papier : Title - " + m_host.MainWindow.GetSelectedEntry(true).Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
+                    File.AppendAllText(pathForLogs + LogsName, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + m_host.MainWindow.GetSelectedEntry(true).Uuid.ToHexString() + " L'entrée a été copiée dans le presse-papier : Title - " + m_host.MainWindow.GetSelectedEntry(true).Strings.ReadSafe(PwDefs.TitleField) + Environment.NewLine);
 
                 }
             }
@@ -268,7 +269,7 @@ namespace KeeLogs
 
                 else
                 {
-                    File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Ouverture de la Database par " + Environment.MachineName + Environment.NewLine);
+                    File.AppendAllText(pathForLogs + LogsName, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Ouverture de la Database par " + Environment.MachineName + Environment.NewLine);
                 }
             }
             else if (e.Event.Type.Equals(ClosingDatabaseFilePost))
@@ -288,7 +289,7 @@ namespace KeeLogs
 
                 else
                 {
-                    File.AppendAllText(pathForLogs, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Fermeture de la Database par " + Environment.MachineName + Environment.NewLine);
+                    File.AppendAllText(pathForLogs + LogsName, DateTime.Today.ToString("[ dd/MM/yyyy ") + "" + DateTime.Now.ToString("HH:mm:ss ] ") + " Fermeture de la Database par " + Environment.MachineName + Environment.NewLine);
 
                     //using (ZipFile zip = new ZipFile())
                     //{
@@ -305,11 +306,26 @@ namespace KeeLogs
             }
         }
 
-        private void OnSavedEntry(object sender, GwmWindowEventArgs e)
+        /*
+        private void SetTimer()
+        {
+            newTimer = new System.Timers.Timer(3000);
+            newTimer.Elapsed += OnTimedEvent;
+            newTimer.Enabled = true;
+        }
+
+        private void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
             checkMaJ(oldEntriesList);
             EntriesListCompare(oldEntriesList, m_host.MainWindow.GetSelectedEntry(true));
+            MessageBox.Show("3 secondes se sont ecoulée");
         }
+
+        private void OnSavedEntry(object sender, GwmWindowEventArgs e)
+        {
+            //SetTimer();
+        }
+        */
 
         private void ChoosePath(object sender, EventArgs e)
         {
@@ -377,7 +393,8 @@ namespace KeeLogs
 
             // Important! Remove event handlers!
             m_host.MainWindow.FileSaved -= OnFileSaved;
-            //m_host.MainWindow.GetSelectedEntry(true).Touched -= OnSavedEntry;
+            PathLogs.Click -= ChoosePath;
+
 
         }
 
