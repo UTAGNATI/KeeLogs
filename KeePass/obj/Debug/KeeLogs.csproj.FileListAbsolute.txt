@@ -15,7 +15,6 @@ D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\bin\Debug\KeeLogs.pdb
 D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\bin\Debug\KeePass.exe
 D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\bin\Debug\KeePass.exe.config
 D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\bin\Debug\KeePass.XmlSerializers.dll
-D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\obj\Debug\KeeLogs.csprojAssemblyReference.cache
 D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\obj\Debug\KeeLogs.csproj.CoreCompileInputs.cache
 D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\obj\Debug\KeeLogs.csproj.CopyComplete
 D:\TAGNATI\source\repos\KeePass\KeeLogs\KeePass\obj\Debug\KeeLogs.dll

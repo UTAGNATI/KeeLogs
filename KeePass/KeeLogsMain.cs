@@ -74,7 +74,13 @@ namespace KeeLogs
         public override bool Initialize(IPluginHost host)
         {
             if (host == null) return false;
+<<<<<<< HEAD
                 m_host = host;
+=======
+            m_host = host;
+            pathForLogs = @"";
+
+>>>>>>> parent of daf4b25... oui
 
             ToolStripItemCollection tsMenu = m_host.MainWindow.ToolsMenu.DropDownItems;
 
